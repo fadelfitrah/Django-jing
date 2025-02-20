@@ -17,6 +17,7 @@ def index(request):
 
     return render(request, 'tasks/index.html', {'tasks': tasks, 'search_query': query})
 
+# Membuat fungsi complate tsak untuk melakukan perubahan pada UI index
 def complete_task(request, task_id):
     task = Task.objects.get(id=task_id)
     task.completed = True
