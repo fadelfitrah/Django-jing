@@ -1,0 +1,44 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <h1>To-Do List</h1>
+    <!-- Form Pencarian -->
+    <form method="GET" action="." class="search-form">
+        <input type="text" name="search" placeholder="Cari tugas..." value="{{ search_query }}">
+        <button type="submit">Cari</button>
+        {% if search_query %}
+            <a href="." class="clear-search">Hapus Pencarian</a>
+        {% endif %}
+    </form>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="Tambahkan tugas baru" required>
+        <button type="submit">Tambah</button>
+    </form>
+
+    <ul>
+        {% for task in tasks %}
+            <li class="{% if task.completed %}completed{% endif %}">
+                <span>{{ task.title }}</span>
+                <div class="actions">
+                    {% if not task.completed %}
+                        <a href="{% url 'complete_task' task.id %}" class="btn-complete">Selesai</a>
+                    {% endif %}
+                    <a href="{% url 'delete_task' task.id %}" class="btn-delete">Hapus</a>
+                </div>
+            </li>
+        {% empty %}
+            <li>Tidak ada tugas ditemukan.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
