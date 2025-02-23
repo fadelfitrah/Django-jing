@@ -9,9 +9,10 @@ def index(request):
         tasks = Task.objects.all()
 
     if request.method == 'POST':
-        title = request.POST.get('title')
+        title = request.POST.get('task-title')
+        description = request.POST.get('task-desc')
         if title:
-            Task.objects.create(title=title)
+            Task.objects.create(title=title, description=description)
             return redirect('index')
 
     return render(request, 'tasks/index.html', {'tasks': tasks, 'search_query': query})
