@@ -10,6 +10,7 @@ class Task(models.Model):
     deadline = models.DateTimeField(blank=True, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
 
+    # Metode untuk memberikan pesan warning
     def is_deadline_approaching(self):
         if self.deadline and not self.completed:
             return timezone.now() >= self.deadline - timedelta(days=1) and timezone.now() < self.deadline
