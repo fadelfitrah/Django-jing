@@ -21,5 +21,6 @@ class Task(models.Model):
             return timezone.now() > self.deadline
         return False
 
+    # Metode untuk menampilkan tasks 
     def __str__(self):
         return self.title
