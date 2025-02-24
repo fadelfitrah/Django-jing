@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tasks',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -81,6 +82,10 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'myTugas.wsgi.application'
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL = 'login'
 
 
 # Database
