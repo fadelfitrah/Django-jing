@@ -54,7 +54,7 @@
             </div>
             <div class="input-group">
                 <span class="input-group-text">Description</span>
-                <textarea class="form-control" name="task-desc" placeholder="Deskripsi Tugas" aria-label="Description" rows="1"></textarea>
+                <textarea class="form-control" name="task-desc" placeholder="Deskripsi Tugas" aria-label="Description" rows="1" required></textarea>
             </div>
             <div class="input-group">
                 <span class="input-group-text">Deadline</span>
@@ -72,6 +72,8 @@
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
+            {% empty %}
+                <div class="alert alert-info">Tidak ada pesan untuk ditampilkan.</div>
             {% endfor %}
         {% endif %}
 
@@ -101,13 +103,7 @@
                         </a>
                     </td>
                     <td>{{ task.completed|yesno:"Selesai,Belum Selesai" }}</td>
-                    <td>
-                        {% if task.deadline %}
-                            {{ task.deadline|date:"Y-m-d H:i" }}
-                        {% else %}
-                            Tidak Ada Deadline
-                        {% endif %}
-                    </td>
+                    <td>{{ task.deadline }}</td>
                     <td class="action">
                         {% if not task.completed %}
                         <form method="POST" action="{% url 'edit_task' task.id %}" style="display:inline;">

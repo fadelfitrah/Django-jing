@@ -10,11 +10,13 @@ def index(request):
     else:
         tasks = Task.objects.all()
 
-    for task in tasks:
-        if task.deadline and task.completed == 'Belum Selesai':
-            time_remaining = task.deadline - timezone.now()
-            if time_remaining.total_seconds() <= 86400:
-                messages.warning(request, f"Tugas '{task.title}' hampir mencapai deadline!")
+    for task in tasks:            
+        if task.is_deadline_approaching():
+            messages.warning(request, f"Tugas '{task.title}' hampir mencapai deadline!")
+
+        elif task.is_overdue():
+            messages.error(request, f"Tugas '{task.title}' sudah melewati deadline!")
+
 
     if request.method == 'POST':
         title = request.POST.get('task-title')
@@ -30,7 +32,7 @@ def index(request):
 def edit_task(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     if request.method == 'POST':
-        task.completed = not task.completed  # Toggle status
+        task.completed = not task.completed
         task.save()
         return redirect('index')
 

@@ -52,11 +52,13 @@ MIDDLEWARE = [
 
 from django.contrib.messages import constants as messages
 
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
 MESSAGE_TAGS = {
     messages.DEBUG: 'debug',
     messages.INFO: 'info',
     messages.SUCCESS: 'success',
-    messages.WARNING: 'warning',  # ✅ Penting untuk warning
+    messages.WARNING: 'warning',  
     messages.ERROR: 'danger',
 }
 
