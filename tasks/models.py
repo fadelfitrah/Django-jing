@@ -15,6 +15,7 @@ class Task(models.Model):
             return timezone.now() >= self.deadline - timedelta(days=1) and timezone.now() < self.deadline
         return False
 
+    # Metode untuk cek waktu deadline
     def is_overdue(self):
         if self.deadline and not self.completed:
             return timezone.now() > self.deadline
