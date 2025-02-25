@@ -5,7 +5,39 @@
 {% block content %}
     <div class="container">
         <h1 class="mt-4 text-center">Daftar Tugas</h1>
-        <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+        <div class="d-flex gap-3">
+            <a href="{% url 'logout' %}" class="btn btn-danger w-10 p-2">Logout</a>
+            <!-- Ikon Notifikasi -->
+            <div class="dropdown text-end mb-3">
+                <button class="btn btn-secondary dropdown-toggle position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-bell"></i>
+                    {% if messages %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ messages|length }}
+                    </span>
+                    {% endif %}
+                </button>
+
+                <!-- Dropdown untuk Pesan -->
+                <ul class="dropdown-menu p-2 shadow-lg" aria-labelledby="notificationDropdown" style="min-width: 300px;">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <li>
+                                <div class="dropdown-item d-flex align-items-start">
+                                    <i class="bi bi-exclamation-circle-fill text-warning me-2"></i>
+                                    <span>{{ message }}</span>
+                                </div>
+                                {% if not forloop.last %}
+                                    <hr class="my-1">
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <li><span class="dropdown-item-text text-muted">Tidak ada pesan baru</span></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
         <br><br>
 
         <!-- Form Pencarian -->
@@ -39,18 +71,6 @@
             </div>
         </form>
         <br>
-
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% empty %}
-                <div class="alert alert-info">Tidak ada pesan untuk ditampilkan.</div>
-            {% endfor %}
-        {% endif %}
-
 
         <!-- Tabel Daftar Tugas -->
         <table class="table table-striped">
