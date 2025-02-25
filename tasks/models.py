@@ -8,7 +8,7 @@ class Task(models.Model):
     description = models.TextField(blank=True, null=True)
     completed = models.BooleanField(default=False)
     deadline = models.DateTimeField(blank=True, null=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=True)
 
     # Metode untuk memberikan pesan warning
     def is_deadline_approaching(self):

@@ -87,18 +87,14 @@
                 {% for task in tasks %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
-                    <!-- Klik Judul untuk Membuka Deskripsi di Modal -->
                     <td>
-                        <a href="#" class="task-link" 
-                        data-bs-toggle="modal" 
-                        data-bs-target="#taskModal" 
-                        data-description="{{ task.description }}">
+                        <a href="#" class="task-link" data-bs-toggle="modal" data-bs-target="#taskModal" data-description="{{ task.description }}">
                             {{ task.title }}
                         </a>
                     </td>
                     <td>{{ task.completed|yesno:"Selesai,Belum Selesai" }}</td>
-                    <td>{{ task.deadline }}</td>
-                    <td class="action">
+                    <td>{{ task.deadline|date:"d M Y H:i" }}</td>
+                    <td>
                         {% if not task.completed %}
                         <form method="POST" action="{% url 'edit_task' task.id %}" style="display:inline;">
                             {% csrf_token %}
@@ -111,11 +107,11 @@
                         </form>
                     </td>
                 </tr>
-                {% empty %}
+            {% empty %}
                 <tr>
-                    <td colspan="4">Tidak ada tugas yang ditemukan.</td>
+                    <td colspan="5">Tidak ada tugas yang ditemukan.</td>
                 </tr>
-                {% endfor %}
+            {% endfor %}
             </tbody>
         </table>
     </div>

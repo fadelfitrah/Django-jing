@@ -17,14 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from tasks import views
+from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
     path('', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
     path('register/', views.register, name='register'),
     path('home/', views.index, name='index'),
-    path('edit/<int:task_id>/', views.edit_task, name='edit_task'),
-    path('delete/<int:task_id>/', views.delete_task, name='delete_task'),
+    path('edit/<int:task_id>/', login_required(views.edit_task), name='edit_task'),
+    path('delete/<int:task_id>/', login_required(views.delete_task), name='delete_task'),
 ]
 
 
