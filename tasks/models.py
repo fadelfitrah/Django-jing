@@ -24,4 +24,4 @@ class Task(models.Model):
 
     # Metode untuk menampilkan tasks 
     def __str__(self):
-        return self.title
+        return (f"Title: {self.title}, Description: {self.description}")

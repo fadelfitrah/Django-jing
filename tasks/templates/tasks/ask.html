@@ -1,0 +1,16 @@
+{% extends 'tasks/index.html' %}
+
+{% block title %}To-Do List{% endblock %}
+
+{% block ask %}
+<form action="{% url 'ask_ai' %}" method="POST" class="d-flex gap-3">
+    <div class="input-group">
+        <span class="input-group-text">Pertanyaan</span>
+        {% csrf_token %}
+        <textarea class="form-control" placeholder="Ajukan Pertanyaan..." name="question" rows="5" aria-label="Pertanyaan"></textarea><br>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-info w-100" type="submit">Kirim</button>
+    </div>
+</form>
+{% endblock %}

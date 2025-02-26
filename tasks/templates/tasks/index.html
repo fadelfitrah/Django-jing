@@ -37,6 +37,7 @@
                     {% endif %}
                 </ul>
             </div>
+            <a class="btn btn-info" href="{% url 'ask_ai' %}">Tanya AI</a>
         </div>
         <br><br>
 
@@ -46,7 +47,9 @@
                 <span class="input-group-text">Cari</span>
                 <input type="text" name="search" class="form-control" aria-label="Cari" placeholder="Cari tugas..." value="{{ search_query }}">
             </div>
-            <button type="submit" class="btn btn-primary w-10">Cari</button>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Cari</button>
+            </div>
         </form>
 
         <br>
@@ -60,7 +63,7 @@
             </div>
             <div class="input-group">
                 <span class="input-group-text">Description</span>
-                <textarea class="form-control" name="task-desc" placeholder="Deskripsi Tugas" aria-label="Description" rows="1" required></textarea>
+                <textarea class="form-control" name="task-desc" placeholder="Deskripsi Tugas" aria-label="Description" rows="1"></textarea>
             </div>
             <div class="input-group">
                 <span class="input-group-text">Deadline</span>
@@ -80,6 +83,7 @@
                     <th>Judul Tugas</th>
                     <th>Status</th>
                     <th>Deadline</th>
+                    <th>Owner</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -94,6 +98,7 @@
                     </td>
                     <td>{{ task.completed|yesno:"Selesai,Belum Selesai" }}</td>
                     <td>{{ task.deadline|date:"d M Y H:i" }}</td>
+                    <td>{{ task.owner }}</td>
                     <td>
                         {% if not task.completed %}
                         <form method="POST" action="{% url 'edit_task' task.id %}" style="display:inline;">
@@ -114,6 +119,9 @@
             {% endfor %}
             </tbody>
         </table>
+        <br>
+        {% block ask %}{% endblock %}
+        <br><br>
     </div>
 
     <!-- Modal untuk Deskripsi -->

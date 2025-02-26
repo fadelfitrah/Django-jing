@@ -4,7 +4,83 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.http import HttpResponse
+from django.conf import settings
 from .models import Task
+import json
+import requests
+import os
+from groq import Groq
+
+@login_required(login_url='login')
+def index(request):
+    tasks = Task.objects.filter(owner=request.user)
+
+    query = request.GET.get('search')
+    if query:
+        tasks = Task.objects.filter(title__icontains=query)
+    else:
+        tasks = Task.objects.filter(owner=request.user)
+
+    for task in tasks:            
+        if task.is_deadline_approaching():
+            messages.warning(request, f"Tugas '{task.title}' hampir mencapai deadline!")
+
+        elif task.is_overdue():
+            messages.error(request, f"Tugas '{task.title}' sudah melewati deadline!")
+
+
+    if request.method == "POST":
+        title = request.POST.get('task-title')
+        description = request.POST.get('task-desc')
+        deadline = request.POST.get('task-deadline')
+        new_task = Task(
+            title=title, 
+            description=description, 
+            deadline=deadline,
+            owner=request.user
+        )
+        new_task.save()
+        return redirect('index')
+
+    return render(request, 'tasks/index.html', {'tasks': tasks, 'search_query': query})
+
+@login_required(login_url='login')
+def ask_ai(request):
+    tasks = Task.objects.filter(owner=request.user)
+    if request.method == 'POST':
+        question = request.POST.get('question')
+        if question:
+            try:
+                # Inisialisasi client Groq
+                client = Groq(
+                    api_key=settings.GROQ_API_KEY
+                )
+                # Kirim permintaan ke Groq
+                chat_completion = client.chat.completions.create(
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": question,
+                        }
+                    ],
+                    model="llama-3.3-70b-versatile",
+                )
+                # Ambil jawaban dari API
+                answer = chat_completion.choices[0].message.content
+
+                if answer:
+                    return render(request, "tasks/result.html", {'answer': answer})
+                else:
+                    return render(request, "tasks/result.html", {'answer': "Terjadi kesalahan!"})
+            
+            except Exception as e:
+                # Tampilkan error jika terjadi masalah
+                return HttpResponse(f"Terjadi kesalahan: {e}")
+
+    # Jika bukan POST atau tidak ada pertanyaan, tampilkan form
+    return render(request, "tasks/ask.html", {"tasks": tasks})
+
 
 def user_logout(request):
     logout(request)
@@ -57,39 +133,6 @@ def register(request):
         form = UserCreationForm()
 
     return render(request, 'tasks/register.html', {'form': form})
-
-@login_required(login_url='login')
-def index(request):
-    tasks = Task.objects.filter(owner=request.user)
-
-    query = request.GET.get('search')
-    if query:
-        tasks = Task.objects.filter(title__icontains=query)
-    else:
-        tasks = Task.objects.all()
-
-    for task in tasks:            
-        if task.is_deadline_approaching():
-            messages.warning(request, f"Tugas '{task.title}' hampir mencapai deadline!")
-
-        elif task.is_overdue():
-            messages.error(request, f"Tugas '{task.title}' sudah melewati deadline!")
-
-
-    if request.method == "POST":
-        title = request.POST.get('task-title')
-        description = request.POST.get('task-desc')
-        deadline = request.POST.get('task-deadline')
-        new_task = Task(
-            title=title, 
-            description=description, 
-            deadline=deadline,
-            owner=request.user  # Simpan owner sebagai user yang sedang login
-        )
-        new_task.save()
-        return redirect('index')
-
-    return render(request, 'tasks/index.html', {'tasks': tasks, 'search_query': query})
 
 @login_required(login_url='login')
 def edit_task(request, task_id):

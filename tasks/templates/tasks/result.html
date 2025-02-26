@@ -1,0 +1,9 @@
+{% extends 'tasks/index.html' %}
+
+{% block title %}To-Do List{% endblock %}
+
+{% block ask %}
+<h1>Jawaban:</h1>
+<p>{{ answer }}</p>
+<a href="{% url 'ask_ai' %}">Kembali</a>
+{% endblock %}

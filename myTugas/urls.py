@@ -26,6 +26,7 @@ urlpatterns = [
     path('home/', views.index, name='index'),
     path('edit/<int:task_id>/', login_required(views.edit_task), name='edit_task'),
     path('delete/<int:task_id>/', login_required(views.delete_task), name='delete_task'),
+    path('ask/', views.ask_ai, name='ask_ai'),
 ]
 
 
