@@ -3,19 +3,19 @@
 {% block title %}To-Do List{% endblock %}
 
 {% block ask %}
-<div class="container mt-2">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-lg">
-                <div class="card-header bg-info text-white">
-                    <h1 class="card-title text-center">Jawaban AI</h1>
-                </div>
-                <div class="card-body">
-                    <p class="card-text lead p-2">{{ answer|safe }}</p>
-                </div>
-                <div class="card-footer text-center">
-                    <a href="{% url 'ask_ai' %}" class="btn btn-secondary">Kembali</a>
-                </div>
+<div class="flex justify-center mt-6">
+    <div class="w-full md:w-3/4 lg:w-1/2">
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="bg-gray-800 text-white py-4 px-6">
+                <h2 class="text-2xl font-bold text-center">Jawaban AI</h2>
+            </div>
+            <div class="p-6">
+                <p class="text-gray-700 text-lg leading-relaxed">{{ answer|safe }}</p>
+            </div>
+            <div class="bg-gray-100 py-8 text-center">
+                <a href="{% url 'ask_ai' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out">
+                    Kembali
+                </a>
             </div>
         </div>
     </div>

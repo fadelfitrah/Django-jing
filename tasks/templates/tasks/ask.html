@@ -3,14 +3,19 @@
 {% block title %}To-Do List{% endblock %}
 
 {% block ask %}
-<form action="{% url 'ask_ai' %}" method="POST" class="d-flex gap-3">
-    <div class="input-group">
-        <span class="input-group-text">Pertanyaan</span>
-        {% csrf_token %}
-        <textarea class="form-control" placeholder="Ajukan Pertanyaan..." name="question" rows="5" aria-label="Pertanyaan"></textarea><br>
+<form action="{% url 'ask_ai' %}" method="POST" class="flex flex-col md:flex-row gap-4 items-start bg-white shadow-md rounded-lg p-6">
+    {% csrf_token %}
+    <div class="w-full">
+        <label class="block text-gray-700 font-bold mb-2">Pertanyaan</label>
+        <textarea class="w-full h-32 p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                  placeholder="Ajukan Pertanyaan..." 
+                  name="question"></textarea>
     </div>
-    <div class="col-md-2">
-        <button class="btn btn-info w-100" type="submit">Kirim</button>
+    <div class="w-full md:w-auto self-end">
+        <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out w-full md:w-auto" 
+                type="submit">
+            Kirim
+        </button>
     </div>
 </form>
 {% endblock %}
