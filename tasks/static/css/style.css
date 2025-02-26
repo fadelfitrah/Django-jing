@@ -95,6 +95,17 @@ ul {
     gap: 1rem;
 }
 
+.content {
+    margin-top: 20px;
+    line-height: 1.6;
+}
+ul {
+    padding-left: 20px;
+}
+li {
+    margin-bottom: 10px;
+}
+
 ul li {
     background: #f9f9f9;
     border: 1px solid #eee;
@@ -152,4 +163,17 @@ ul li .delete-task {
 
 .action .delete-btn {
     background: #f44336;
+}
+
+.back-button {
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+    color: white;
+    background-color: #007bff;
+    padding: 10px 15px;
+    border-radius: 6px;
+}
+.back-button:hover {
+    background-color: #0056b3;
 }

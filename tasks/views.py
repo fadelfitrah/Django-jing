@@ -70,7 +70,7 @@ def ask_ai(request):
                 answer = chat_completion.choices[0].message.content
 
                 if answer:
-                    return render(request, "tasks/result.html", {'answer': answer})
+                    return render(request, "tasks/result.html", {'answer': answer, 'tasks': tasks})
                 else:
                     return render(request, "tasks/result.html", {'answer': "Terjadi kesalahan!"})
             
