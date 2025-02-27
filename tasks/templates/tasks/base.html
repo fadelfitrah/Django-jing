@@ -24,36 +24,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body class="bg-gray-100 text-gray-800 w-full min-w-full">
-    <div class="w-full items-center bg-gray-800">
-        <h1 class="text-4xl items-center font-bold text-center text-white py-6 px-auto mb-8">Daftar Tugas</h1>
-    </div>
-    <div class="flex gap-4 justify-center mb-6">
-        <a href="{% url 'logout' %}" class="flex items-center bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">Logout</a>
-        <div class="relative">
-
-            <button id="notifBtn" class="bg-gray-800 text-white rounded-lg p-3 relative focus:outline-none hover:bg-gray-600">
-                <i class="bi bi-bell-fill"></i>
-                {% if messages %}
-                <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                    {{ messages|length }}
-                </span>
-                {% endif %}
-            </button>
-
-            <div id="notifDropdown" class="absolute overflow-hidden right-0 hidden mt-2 w-96 bg-white shadow-lg rounded-md z-10">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="border-b border-gray-200 px-4 py-2 text-sm text-gray-800">
-                            <i class="bi bi-exclamation-circle-fill text-yellow-500 mr-2"></i>{{ message }}
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <li class="px-4 py-2 text-gray-500">Tidak ada pesan baru</li>
-                {% endif %}
-            </div>
-        </div>
-        <a class="flex items-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg" href="{% url 'ask_ai' %}">Tanya AI</a>
-    </div>
     {% block content %}{% endblock %}
 </body>
 </html>

@@ -2,23 +2,92 @@
 
 {% block title %}To-Do List{% endblock %}
 
-{% block content %}
-    <div class="container mx-auto p-6">
-        <form method="GET" action="{% url 'index' %}" class="flex gap-4 mb-6">
-            <input type="text" name="search" class="border rounded-lg p-2 w-full" placeholder="Cari tugas..." value="{{ search_query }}">
-            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">Cari</button>
-        </form>
+{% load static %}
 
+{% block content %}
+    <div class="flex gap-6 justify-between w-full px-8 items-center bg-gray-800 mb-8">
+        <h1 class="text-4xl font-bold text-center text-white py-6 px-auto">Daftar Tugas</h1>
+        <div class="relative flex gap-6 inline-block text-left">
+            <form method="GET" action="{% url 'index' %}" class="flex gap-0 w-96">
+                <input type="text" name="search" class="border rounded-full px-6 py-2 w-full" placeholder="Cari tugas..." value="{{ search_query }}">
+                <button type="submit" class="bg-none hover:text-gray-500 text-white py-2 px-4 rounded">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+            <button id="notifBtn" class="flex items-center bg-white text-gray-800 rounded-full h-10 w-10 p-3 relative focus:outline-none hover:bg-gray-100">
+                <i class="bi bi-bell-fill"></i>
+                {% if messages %}
+                <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded h-5 w-5 flex items-center justify-center" id="messageLength">
+                    {{ messages|length }}
+                </span>
+                {% endif %}
+            </button>
+
+            <div id="notifDropdown" class="absolute overflow-hidden right-12 hidden mt-12 w-96 bg-white shadow-lg rounded-md z-10">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="border-b border-gray-200 px-4 py-2 text-sm text-gray-800">
+                            <i class="bi bi-exclamation-circle-fill text-yellow-500 mr-2"></i>{{ message }}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <li class="px-4 py-2 text-gray-500">Tidak ada pesan baru</li>
+                {% endif %}
+            </div>
+            <!-- Gambar yang akan di-klik -->
+            {% if request.user.userprofile.photo %}
+            <img id="profileImage" 
+                src="{{ request.user.userprofile.photo.url }}"
+                class="w-10 h-10 rounded-full cursor-pointer" 
+                alt="Foto Profil">
+            {% else %}
+            <img id="profileImage" src="{% static 'default-avatar.png' %}" alt="Default Avatar" class="w-10 h-10 cursor-pointer">
+            {% endif %}
+
+            <!-- Dropdown Items -->
+            <div id="dropdownMenu" 
+                class="hidden absolute right-0 mt-12 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                <div class="py-1">
+                    <a href="{% url 'edit_profile' %}" 
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
+                    id="edit_btn" onclick="toggleEdit()"> 
+                    Pengaturan Profil
+                    </a>
+                    <a href="{% url 'logout' %}" 
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    Logout
+                    </a>
+                </div>
+            </div>
+            <div id="edit_form"
+                 class="hidden absolute right-0 mt-14 w-full bg-white rounded-md shadow-lg ring-1 ring-white ring-opacity-5 focus:outline-none z-10 shadow-outline">
+                 <h2 class="font-bold text-center text-white w-full bg-gray-800 rounded py-2">Edit Profile</h2>
+                {% block edit %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <div class="flex gap-4 justify-center mb-6">
+        <a href="{% url 'logout' %}" class="flex items-center bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">Logout</a>
+        <div class="relative">
+
+            
+        </div>
+        <a class="flex items-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg" href="{% url 'ask_ai' %}">Tanya AI</a>
+
+    </div>
+
+    <div class="container mx-auto p-6">        
         <h3 class="flex gap-4 px-auto items-center text-gray-800 my-4 text-start text-2xl font-bold">
             <i class="bi bi-plus-circle-fill"></i> Tambah Tugas
         </h3>
         <form action="{% url 'index' %}" method="POST" class="flex flex-wrap gap-4 mb-8">
             {% csrf_token %}
-            <input type="text" class="flex-grow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="task-title" placeholder="Judul Tugas" required>
+            <input type="text" class="flex-grow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-gray-800" name="task-title" placeholder="Judul Tugas" required>
 
-            <textarea class="w-full border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="task-desc" placeholder="Deskripsi Tugas" rows="2"></textarea>
+            <textarea class="w-full border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-gray-800" name="task-desc" placeholder="Deskripsi Tugas" rows="2"></textarea>
 
-            <input type="datetime-local" class="border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="task-deadline">
+            <input type="datetime-local" class="border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-gray-800" name="task-deadline">
 
             <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded flex items-center">Tambah</button>
         </form>
@@ -35,9 +104,15 @@
             </thead>
             <tbody>
                 {% for task in tasks %}
-                <tr class="border-b">
+                <tr class="border-b group relative">
                     <td class="py-3 px-4 text-center">{{ forloop.counter }}</td>
-                    <td class="py-3 px-4 text-center">{{ task.title }}</td>
+                    <td class="py-3 px-4 text-center hover:text-blue-500 flex-wrap cursor-pointer" onclick='toggleDescription("{{ task.id }}")'>
+                        {{ task.title }}
+                        <div id="desc-{{ task.id }}" 
+                            class="mt-2 hidden bg-white shadow-lg border border-gray-200 rounded-md p-4 text-sm text-gray-700 z-10 text-start">
+                            {{ task.description }}
+                        </div>
+                    </td>
                     <td class="py-3 px-4 text-center">{{ task.completed|yesno:"Selesai,Belum Selesai" }}</td>
                     <td class="py-3 px-4 text-center">{{ task.deadline|date:"d M Y H:i" }}</td>
                     <td class="py-3 px-4 flex justify-center gap-2">
@@ -68,10 +143,19 @@
         {% block ask %}{% endblock %}
     </div>
     <script>
+        function toggleDescription(taskId) {
+            const description = document.getElementById(`desc-${ taskId }`);
+            if (description.classList.contains('hidden')) {
+                description.classList.remove('hidden');
+            } else {
+                description.classList.add('hidden');
+            }
+        }
         $(document).ready(function() {
             $('#notifBtn').on('click', function(event) {
                 event.stopPropagation();
                 $('#notifDropdown').toggleClass('hidden');
+                $('#messageLength').addClass('hidden');
             });
             
             $(document).on('click', function() {
@@ -79,6 +163,42 @@
             });
             
             $('#notifDropdown').on('click', function(event) {
+                event.stopPropagation();
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $('#profileImage').on('click', function(event) {
+                event.stopPropagation();
+                $('#dropdownMenu').toggleClass('hidden');
+            })
+            $(document).on('click', function(event) {
+                $('#dropdownMenu').addClass('hidden');
+            })
+            $('#dropdownMenu').on('click', function(event) {
+                evrnt.stopPropagation();
+            })
+        })
+    </script>
+    <script>
+        const editForm = document.getElementById('edit_form');
+        if(editForm.classList.contains('hidden')) {
+            editForm.classList.remove('hidden');
+        } else {
+            editForm.classList.add('hidden');
+        }
+        $(document).ready(function() {
+            // Toggle edit form saat editBtn diklik
+            $('#edit_btn').on('click', function(event) {
+                event.stopPropagation();
+                $('#edit_form').toggleClass('hidden');
+            });
+            $(document).on('click', function() {
+                $('#edit_form').addClass('hidden');
+            });
+            $('#edit_form').on('click', function(event) {
                 event.stopPropagation();
             });
         });

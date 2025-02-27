@@ -17,6 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from tasks import views
+from tasks.views import edit_profile
+from django.conf.urls.static import static
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
@@ -27,6 +30,7 @@ urlpatterns = [
     path('edit/<int:task_id>/', login_required(views.edit_task), name='edit_task'),
     path('delete/<int:task_id>/', login_required(views.delete_task), name='delete_task'),
     path('ask/', views.ask_ai, name='ask_ai'),
-]
+    path('profile/edit/', edit_profile, name='edit_profile'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

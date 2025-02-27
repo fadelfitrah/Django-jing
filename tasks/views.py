@@ -7,10 +7,26 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.http import HttpResponse
 from django.conf import settings
 from .models import Task
+from .models import UserProfile
+from .forms import UserProfileForm
 import json
 import requests
 import os
 from groq import Groq
+
+@login_required(login_url='login')
+def edit_profile(request):
+    tasks = Task.objects.filter(owner=request.user)
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('index')  # Ubah sesuai dengan URL tujuan setelah edit
+    else:
+        form = UserProfileForm(instance=profile)
+    
+    return render(request, 'tasks/edit_profile.html', {'form': form, 'tasks': tasks})
 
 @login_required(login_url='login')
 def index(request):
