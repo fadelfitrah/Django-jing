@@ -6,11 +6,11 @@
     <div class="container mx-auto p-6">
         <h1 class="text-4xl font-bold text-center mb-8">Daftar Tugas</h1>
         <div class="flex gap-4 justify-center mb-6">
-            <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">Logout</a>
+            <a href="{% url 'logout' %}" class="flex items-center bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">Logout</a>
             <div class="relative">
 
-                <button id="notifBtn" class="bg-gray-800 text-white rounded-full p-3 relative focus:outline-none">
-                    <i class="bi bi-bell"></i>
+                <button id="notifBtn" class="bg-gray-800 text-white rounded-lg p-3 relative focus:outline-none hover:bg-gray-600">
+                    <i class="bi bi-bell-fill"></i>
                     {% if messages %}
                     <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                         {{ messages|length }}
@@ -18,10 +18,10 @@
                     {% endif %}
                 </button>
 
-                <div class="absolute overflow-hidden right-0 mt-2 w-64 bg-white shadow-lg rounded-md z-10">
+                <div id="notifDropdown" class="absolute overflow-hidden right-0 hidden mt-2 w-96 bg-white shadow-lg rounded-md z-10">
                     {% if messages %}
                         {% for message in messages %}
-                            <div id="notifDropdown" class="border-b hidden border-gray-200 px-4 py-2 text-sm text-gray-600">
+                            <div class="border-b border-gray-200 px-4 py-2 text-sm text-gray-800">
                                 <i class="bi bi-exclamation-circle-fill text-yellow-500 mr-2"></i>{{ message }}
                             </div>
                         {% endfor %}
@@ -30,7 +30,7 @@
                     {% endif %}
                 </div>
             </div>
-            <a class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded" href="{% url 'ask_ai' %}">Tanya AI</a>
+            <a class="flex items-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg" href="{% url 'ask_ai' %}">Tanya AI</a>
         </div>
 
         <form method="GET" action="{% url 'index' %}" class="flex gap-4 mb-6">
@@ -38,11 +38,17 @@
             <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">Cari</button>
         </form>
 
+        <h3 class="flex gap-4 px-auto items-center text-gray-800 my-4 text-start text-2xl font-bold">
+            <i class="bi bi-plus-circle-fill"></i> Tambah Tugas
+        </h3>
         <form action="{% url 'index' %}" method="POST" class="flex flex-wrap gap-4 mb-8">
             {% csrf_token %}
             <input type="text" class="flex-grow border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="task-title" placeholder="Judul Tugas" required>
+
             <textarea class="w-full border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="task-desc" placeholder="Deskripsi Tugas" rows="2"></textarea>
+
             <input type="datetime-local" class="border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="task-deadline">
+
             <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded flex items-center">Tambah</button>
         </form>
 
@@ -53,7 +59,6 @@
                     <th class="py-3 px-4">Judul Tugas</th>
                     <th class="py-3 px-4">Status</th>
                     <th class="py-3 px-4">Deadline</th>
-                    <th class="py-3 px-4">Owner</th>
                     <th class="py-3 px-4">Aksi</th>
                 </tr>
             </thead>
@@ -61,20 +66,23 @@
                 {% for task in tasks %}
                 <tr class="border-b">
                     <td class="py-3 px-4 text-center">{{ forloop.counter }}</td>
-                    <td class="py-3 px-4">{{ task.title }}</td>
-                    <td class="py-3 px-4">{{ task.completed|yesno:"Selesai,Belum Selesai" }}</td>
-                    <td class="py-3 px-4">{{ task.deadline|date:"d M Y H:i" }}</td>
-                    <td class="py-3 px-4">{{ task.owner }}</td>
-                    <td class="py-3 px-4 flex gap-2">
+                    <td class="py-3 px-4 text-center">{{ task.title }}</td>
+                    <td class="py-3 px-4 text-center">{{ task.completed|yesno:"Selesai,Belum Selesai" }}</td>
+                    <td class="py-3 px-4 text-center">{{ task.deadline|date:"d M Y H:i" }}</td>
+                    <td class="py-3 px-4 flex justify-center gap-2">
                         {% if not task.completed %}
                         <form method="POST" action="{% url 'edit_task' task.id %}">
                             {% csrf_token %}
-                            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded">Selesai</button>
+                            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded">
+                                <i class="bi bi-check-square-fill"></i>
+                            </button>
                         </form>
                         {% endif %}
                         <form method="POST" action="{% url 'delete_task' task.id %}">
                             {% csrf_token %}
-                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded">Hapus</button>
+                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
                         </form>
                     </td>
                 </tr>

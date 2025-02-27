@@ -18,7 +18,7 @@ def index(request):
 
     query = request.GET.get('search')
     if query:
-        tasks = Task.objects.filter(title__icontains=query)
+        tasks = Task.objects.filter(title__icontains=query, owner=request.user)
     else:
         tasks = Task.objects.filter(owner=request.user)
 
