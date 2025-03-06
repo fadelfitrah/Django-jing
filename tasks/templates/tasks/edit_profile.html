@@ -3,7 +3,7 @@
 {% block title %}Edit{% endblock %}
 
 {% block edit %}
-
+<h2 class="font-bold text-center text-white w-full bg-gray-800 rounded py-2">Edit Profile</h2>
 <form method="post" class="p-4 block" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}

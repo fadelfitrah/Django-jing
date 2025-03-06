@@ -61,7 +61,6 @@
             </div>
             <div id="edit_form"
                  class="hidden absolute right-0 mt-14 w-full bg-white rounded-md shadow-lg ring-1 ring-white ring-opacity-5 focus:outline-none z-10 shadow-outline">
-                 <h2 class="font-bold text-center text-white w-full bg-gray-800 rounded py-2">Edit Profile</h2>
                 {% block edit %}{% endblock %}
             </div>
         </div>
@@ -184,17 +183,12 @@
     </script>
     <script>
         const editForm = document.getElementById('edit_form');
-        if(editForm.classList.contains('hidden')) {
-            editForm.classList.remove('hidden');
-        } else {
-            editForm.classList.add('hidden');
-        }
         $(document).ready(function() {
-            // Toggle edit form saat editBtn diklik
-            $('#edit_btn').on('click', function(event) {
-                event.stopPropagation();
-                $('#edit_form').toggleClass('hidden');
-            });
+            if(editForm.classList.contains('hidden')) {
+                editForm.classList.remove('hidden');
+            } else {
+                editForm.classList.add('hidden');
+            }
             $(document).on('click', function() {
                 $('#edit_form').addClass('hidden');
             });

@@ -31,6 +31,8 @@ urlpatterns = [
     path('delete/<int:task_id>/', login_required(views.delete_task), name='delete_task'),
     path('ask/', views.ask_ai, name='ask_ai'),
     path('profile/edit/', edit_profile, name='edit_profile'),
+    path("add/", views.add_todo, name="add_todo"),
+    path("tugas/", views.tugas_list, name="tugas_list"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

@@ -1,0 +1,51 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daftar Tugas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 flex flex-col items-start">
+    <h2 class="w-full bg-slate-800 text-2xl font-bold text-white p-4 mb-6">
+      Daftar Tugas
+    </h2>
+
+    <a
+      href="{% url 'add_todo' %}"
+      class="bg-slate-800 text-white mx-8 px-5 py-2 rounded-md shadow-md hover:bg-slate-700 transition duration-300 mb-4">
+      Tambah Tugas
+    </a>
+
+    <div class="w-full flex items-center px-8">
+      <table class="w-full bg-white shadow-md rounded-lg overflow-hidden">
+        <thead>
+          <tr class="bg-slate-800 text-white">
+            <th class="py-3 px-4 text-left">Judul</th>
+            <th class="py-3 px-4 text-left">Deskripsi</th>
+            <th class="py-3 px-4 text-center">Diselesaikan</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tugas in tugas %}
+          <tr class="border-b hover:bg-gray-200">
+            <td class="py-3 px-4">{{ tugas.title }}</td>
+            <td class="py-3 px-4">{{ tugas.desc }}</td>
+            <td class="py-3 px-4 text-center">
+              {{ tugas.diselesaikan|yesno:"✅,❌" }}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3" class="text-center py-4 text-gray-500">
+              Tidak ada tugas yang tersedia.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

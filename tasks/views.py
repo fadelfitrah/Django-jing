@@ -8,7 +8,8 @@ from django.http import HttpResponse
 from django.conf import settings
 from .models import Task
 from .models import UserProfile
-from .forms import UserProfileForm
+from .forms import UserProfileForm, TodoForm
+from firebase_config import db
 import json
 import requests
 import os
@@ -88,7 +89,7 @@ def ask_ai(request):
                 if answer:
                     return render(request, "tasks/result.html", {'answer': answer, 'tasks': tasks})
                 else:
-                    return render(request, "tasks/result.html", {'answer': "Terjadi kesalahan!"})
+                    return render(request, "tasks/result.html", {'answer': "Terjadi kesalahan!", 'tasks': tasks})
             
             except Exception as e:
                 # Tampilkan error jika terjadi masalah
@@ -97,7 +98,7 @@ def ask_ai(request):
     # Jika bukan POST atau tidak ada pertanyaan, tampilkan form
     return render(request, "tasks/ask.html", {"tasks": tasks})
 
-
+@login_required
 def user_logout(request):
     logout(request)
     return redirect('login')
@@ -134,10 +135,6 @@ def user_login(request):
 
     return render(request, 'tasks/login.html', {'form': form})
 
-def user_logout(request):
-    logout(request)
-    return redirect('login')
-
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -164,3 +161,32 @@ def delete_task(request, task_id):
     if request.method == 'POST':
         task.delete()
         return redirect('index')
+
+def add_todo(request):
+    if request.method == "POST":
+        form = TodoForm(request.POST)
+        if form.is_valid():
+            # Simpan data ke Firestore
+            db.collection("Tasks").add({
+                "title": form.cleaned_data["title"],
+                "desc": form.cleaned_data["desc"],
+                "diselesaikan": form.cleaned_data["diselesaikan"]
+            })
+            return redirect("tugas_list")  # Ganti dengan nama URL untuk menampilkan daftar todo
+    
+    else:
+        form = TodoForm()
+    
+    return render(request, "tasks/add_todo.html", {"form": form})
+
+def tugas_list(request):
+    # Ambil data dari koleksi 'tugas'
+    tugas_ref = db.collection("Tasks")
+    tugas_docs = tugas_ref.stream()
+
+    # Konversi data menjadi list
+    tugas_list = [
+        {"id": doc.id, **doc.to_dict()} for doc in tugas_docs
+    ]
+
+    return render(request, "tasks/list.html", {"tugas": tugas_list})
