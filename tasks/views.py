@@ -60,7 +60,7 @@ def index(request):
         new_task.save()
         return redirect('index')
 
-    return render(request, 'tasks/index.html', {'tasks': tasks, 'search_query': query})
+    return render(request, 'tasks/index.html', {'tasks': tasks, 'search_query': query, 'messages': messages})
 
 @login_required(login_url='login')
 def ask_ai(request):
@@ -162,6 +162,7 @@ def delete_task(request, task_id):
         task.delete()
         return redirect('index')
 
+@login_required(login_url='login')
 def add_todo(request):
     if request.method == "POST":
         form = TodoForm(request.POST)
@@ -179,8 +180,8 @@ def add_todo(request):
     
     return render(request, "tasks/add_todo.html", {"form": form})
 
+@login_required(login_url='login')
 def tugas_list(request):
-    # Ambil data dari koleksi 'tugas'
     tugas_ref = db.collection("Tasks")
     tugas_docs = tugas_ref.stream()
 
