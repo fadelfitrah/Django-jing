@@ -1,29 +1,40 @@
+<!-- @format -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}To-Do List{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#1E3A8A',
-                        secondary: '#64748B',
-                        accent: '#F59E0B',
-                    }
-                }
-            }
-        }
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#1E3A8A",
+              secondary: "#64748B",
+              accent: "#F59E0B",
+            },
+          },
+        },
+      };
     </script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body class="bg-gray-100 text-gray-800 w-full min-w-full">
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+      rel="stylesheet" />
+    <script src="{% static 'index.js' %}"></script>
+  </head>
+  <body class="bg-gray-100 text-gray-800 w-full min-w-full">
     {% block content %}{% endblock %}
-</body>
+
+    <div class="absolute bottom-0 left-0 right-0 px-4 bg-gray-200 shadow-md">
+      <p class="text-slate-900 text-center text-lg py-2">&copy; Tasks to-do</p>
+    </div>
+  </body>
 </html>

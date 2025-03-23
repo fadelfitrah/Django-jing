@@ -10,6 +10,7 @@ from .models import Task
 from .models import UserProfile
 from .forms import UserProfileForm, TodoForm
 from firebase_config import db
+import datetime
 import json
 import requests
 import os
@@ -32,6 +33,24 @@ def edit_profile(request):
 @login_required(login_url='login')
 def index(request):
     tasks = Task.objects.filter(owner=request.user)
+    now = datetime.datetime.now()
+
+    hari_dict = {
+        "Monday": "Senin",
+        "Tuesday": "Selasa",
+        "Wednesday": "Rabu",
+        "Thursday": "Kamis",
+        "Friday": "Jumat",
+        "Saturday": "Sabtu",
+        "Sunday": "Minggu"
+    }
+
+    hari_ini = hari_dict[now.strftime("%A")]
+    tanggal_ini = now.strftime("%d %B %Y")
+    context = {
+        'hari': hari_ini,
+        'tanggal': tanggal_ini
+    }
 
     query = request.GET.get('search')
     if query:
@@ -60,11 +79,26 @@ def index(request):
         new_task.save()
         return redirect('index')
 
-    return render(request, 'tasks/index.html', {'tasks': tasks, 'search_query': query, 'messages': messages})
+    return render(request, 'tasks/index.html', {'tasks': tasks, 'search_query': query, 'messages': messages, 'hari': hari_ini, 'tanggal': tanggal_ini})
 
 @login_required(login_url='login')
 def ask_ai(request):
     tasks = Task.objects.filter(owner=request.user)
+    now = datetime.datetime.now()
+
+    hari_dict = {
+        "Monday": "Senin",
+        "Tuesday": "Selasa",
+        "Wednesday": "Rabu",
+        "Thursday": "Kamis",
+        "Friday": "Jumat",
+        "Saturday": "Sabtu",
+        "Sunday": "Minggu"
+    }
+
+    hari_ini = hari_dict[now.strftime("%A")]
+    tanggal_ini = now.strftime("%d %B %Y")
+
     if request.method == 'POST':
         question = request.POST.get('question')
         if question:
@@ -96,7 +130,7 @@ def ask_ai(request):
                 return HttpResponse(f"Terjadi kesalahan: {e}")
 
     # Jika bukan POST atau tidak ada pertanyaan, tampilkan form
-    return render(request, "tasks/ask.html", {"tasks": tasks})
+    return render(request, "tasks/ask.html", {"tasks": tasks, 'hari': hari_ini, 'tanggal': tanggal_ini})
 
 @login_required
 def user_logout(request):

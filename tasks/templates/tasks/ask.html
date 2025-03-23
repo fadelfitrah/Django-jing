@@ -3,18 +3,20 @@
 {% block title %}To-Do List{% endblock %}
 
 {% block ask %}
-<form action="{% url 'ask_ai' %}" method="POST" class="flex flex-col md:flex-row gap-4 items-start bg-white shadow-md rounded-lg p-6">
+<form action="{% url 'ask_ai' %}" method="POST" class="bg-white shadow-md rounded-xl p-6 space-y-4">
     {% csrf_token %}
-    <div class="w-full">
-        <label class="block text-gray-700 font-bold mb-2">Pertanyaan</label>
-        <textarea class="w-full h-32 p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                  placeholder="Ajukan Pertanyaan..." 
-                  name="question"></textarea>
+    <div>
+        <label class="block text-lg font-semibold text-gray-800 mb-2">Ajukan Pertanyaan</label>
+        <textarea 
+            class="w-full h-36 p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition-all duration-300" 
+            placeholder="Tulis pertanyaan Anda di sini..." 
+            name="question"></textarea>
     </div>
-    <div class="w-full md:w-auto self-end">
-        <button class="bg-gray-800 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out w-full md:w-auto" 
-                type="submit">
-            Kirim
+    <div class="flex justify-end">
+        <button 
+            class="bg-gradient-to-r from-slate-800 to-slate-500 hover:from-slate-700 hover:to-slate-500 text-white font-semibold py-3 px-6 rounded-xl shadow-md transform hover:scale-105 transition-all duration-300"
+            type="submit">
+            Kirim Pertanyaan 🚀
         </button>
     </div>
 </form>

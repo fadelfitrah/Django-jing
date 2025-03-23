@@ -1,12 +1,16 @@
 <!-- @format -->
 
-{% extends 'tasks/base.html' %} {% block title %}To-Do List{% endblock %} 
-{% load static %} {% block content %}
+{% extends 'tasks/base.html' %} 
+{% block title %}To-Do List{% endblock %} 
+{% load static %} 
+{% block content %}
 <div
-  class="flex gap-6 justify-between w-full px-8 items-center bg-gray-800 mb-8">
-  <h1 class="text-4xl font-bold text-center text-white py-6 px-auto">
-    Daftar Tugas
-  </h1>
+  class="flex gap-6 justify-between w-full px-8 items-center bg-gray-800">
+  <div class="flex justify-center items-center h-auto">    
+    <h1 class="text-2xl font-semibold text-center text-white py-6 px-auto">
+      Daftar Tugas
+    </h1>
+  </div>
   <div class="relative flex gap-6 inline-block text-left">
     <form method="GET" action="{% url 'index' %}" class="flex gap-0 w-96">
       <input
@@ -21,32 +25,20 @@
         <i class="bi bi-search"></i>
       </button>
     </form>
+
+    {% if messages %}
     <button
       id="notifBtn"
       class="flex items-center bg-white text-gray-800 rounded-full h-10 w-10 p-3 relative focus:outline-none hover:bg-gray-100">
       <i class="bi bi-bell-fill"></i>
-      {% if messages %}
-      <span
-        class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded h-5 w-5 flex items-center justify-center"
-        id="messageLength">
-        {{ messages|length }}
-      </span>
-      {% endif %}
-    </button>
+        <span
+          class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded h-5 w-5 flex items-center justify-center"
+          id="messageLength">
+          {{ messages|length }}
+        </span>
+      </button>
+    {% endif %}
 
-    <div
-      id="notifDropdown"
-      class="absolute overflow-hidden right-12 hidden mt-12 w-96 bg-white shadow-lg rounded-md z-10">
-      {% if messages %} {% for message in messages %}
-      <div class="border-b border-gray-200 px-4 py-2 text-sm text-gray-800">
-        <i class="bi bi-exclamation-circle-fill text-yellow-500 mr-2"></i>{{
-        message }}
-      </div>
-      {% endfor %} {% else %}
-      <li class="px-4 py-2 text-gray-500">Tidak ada pesan baru</li>
-      {% endif %}
-    </div>
-    <!-- Gambar yang akan di-klik -->
     {% if request.user.userprofile.photo %}
     <img
       id="profileImage"
@@ -56,7 +48,7 @@
     {% else %}
     <img
       id="profileImage"
-      src="{% static 'default-avatar.png' %}"
+      src=""
       alt="Default Avatar"
       class="w-10 h-10 cursor-pointer" />
     {% endif %}
@@ -87,30 +79,34 @@
     </div>
   </div>
 </div>
-
-<div class="flex gap-4 justify-center mb-6">
-  <a
-    href="{% url 'logout' %}"
-    class="flex items-center bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
-    >Logout</a
-  >
-  <div class="relative"></div>
-  <a
-    class="flex items-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"
-    href="{% url 'ask_ai' %}"
-    >Tanya AI</a
-  >
+<div class="flex justify-start gap-4 items-center w-full bg-gray-200 py-2 px-6 shadow-md">
+  <button class="text-slate-800 text-2xl mr-8" id="appsBtn"><i class="bi bi-grid-fill"></i></button>
+  <p class="text-gray-500">{{ hari }}, {{ tanggal }}</p>
 </div>
 
-<div class="container mx-auto p-6">
-  <h3
-    class="flex gap-4 px-auto items-center text-gray-800 my-4 text-start text-2xl font-bold">
-    <i class="bi bi-plus-circle-fill"></i> Tambah Tugas
-  </h3>
+<div class="flex flex-wrap top-4 left-5 h-auto items-start gap-4 hidden rounded-lg absolute w-[25rem] z-10 p-8 bg-white shadow-lg justify-around" id="appDropdown">
+  <a
+    href="{% url 'logout' %}"
+    class="text-center p-4 bg-red-500 hover:bg-red-600 text-white font-bold rounded-full"
+    ><i class="bi bi-box-arrow-in-left"></i></a
+  >
+  <a
+    class="text-center p-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full"
+    href="{% url 'ask_ai' %}">
+    <i class="bi bi-filetype-ai"></i></a>
+  <button class="bg-slate-800 text-white p-4 rounded-full font-bold" id="addTaskBtn"><i class="bi bi-plus-circle-fill"></i></button>
+</div>
+
+<div class="flex gap-6 items-start container p-8">
   <form
     action="{% url 'index' %}"
     method="POST"
-    class="flex flex-wrap gap-4 mb-8">
+    class="flex flex-wrap w-[30rem] bg-white shadow-lg p-8 hidden rounded-lg border border-1 border-slate-800 gap-4"
+    id="addTaskForms">
+    <div class="flex justify-between w-full">
+      <h3 class="font-bold text-xl mb-2 text-start">Tambah Tugas</h3>
+      <button class="text-red-500 text-2xl relative -top-6 left-4" id="closeForms"><i class="bi bi-x"></i></button>
+    </div>
     {% csrf_token %}
     <input
       type="text"
@@ -137,7 +133,7 @@
     </button>
   </form>
 
-  <table class="min-w-full bg-white shadow rounded-lg overflow-hidden">
+  <table class="w-full h-auto bg-white shadow rounded-lg overflow-hidden">
     <thead>
       <tr class="bg-gray-800 text-white">
         <th class="py-3 px-4">No</th>
@@ -198,62 +194,10 @@
     </tbody>
   </table>
   <br />
+</div>
+<div class="w-[50rem] px-9">
   {% block ask %}{% endblock %}
 </div>
-<script>
-  function toggleDescription(taskId) {
-    const description = document.getElementById(`desc-${taskId}`);
-    if (description.classList.contains("hidden")) {
-      description.classList.remove("hidden");
-    } else {
-      description.classList.add("hidden");
-    }
-  }
-  $(document).ready(function () {
-    $("#notifBtn").on("click", function (event) {
-      event.stopPropagation();
-      $("#notifDropdown").toggleClass("hidden");
-      $("#messageLength").addClass("hidden");
-    });
 
-    $(document).on("click", function () {
-      $("#notifDropdown").addClass("hidden");
-    });
-
-    $("#notifDropdown").on("click", function (event) {
-      event.stopPropagation();
-    });
-  });
-</script>
-
-<script>
-  $(document).ready(function () {
-    $("#profileImage").on("click", function (event) {
-      event.stopPropagation();
-      $("#dropdownMenu").toggleClass("hidden");
-    });
-    $(document).on("click", function (event) {
-      $("#dropdownMenu").addClass("hidden");
-    });
-    $("#dropdownMenu").on("click", function (event) {
-      evrnt.stopPropagation();
-    });
-  });
-</script>
-<script>
-  const editForm = document.getElementById("edit_form");
-  $(document).ready(function () {
-    if (editForm.classList.contains("hidden")) {
-      editForm.classList.remove("hidden");
-    } else {
-      editForm.classList.add("hidden");
-    }
-    $(document).on("click", function () {
-      $("#edit_form").addClass("hidden");
-    });
-    $("#edit_form").on("click", function (event) {
-      event.stopPropagation();
-    });
-  });
-</script>
+<script src="{% static 'css/index.js' %}"></script>
 {% endblock %}
