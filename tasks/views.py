@@ -55,8 +55,6 @@ def index(request):
     query = request.GET.get('search')
     if query:
         tasks = Task.objects.filter(title__icontains=query, owner=request.user)
-    else:
-        tasks = Task.objects.filter(owner=request.user)
 
     for task in tasks:            
         if task.is_deadline_approaching():
@@ -79,7 +77,7 @@ def index(request):
         new_task.save()
         return redirect('index')
 
-    return render(request, 'tasks/index.html', {'tasks': tasks, 'search_query': query, 'messages': messages, 'hari': hari_ini, 'tanggal': tanggal_ini})
+    return render(request, 'tasks/index.html', {'tasks': tasks, 'search_query': query, 'hari': hari_ini, 'tanggal': tanggal_ini})
 
 @login_required(login_url='login')
 def ask_ai(request):
