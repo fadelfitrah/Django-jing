@@ -188,6 +188,66 @@ def edit_task(request, task_id):
         return redirect('index')
 
 @login_required(login_url='login')
+def started_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    if request.method == 'POST':
+        task.started = not task.started
+        task.save()
+        return redirect('index')
+        
+@login_required(login_url='login')
+def started_task_filters(request):
+    tasks = Task.objects.filter(owner=request.user, started=True)
+    now = datetime.datetime.now()
+
+    hari_dict = {
+        "Monday": "Senin",
+        "Tuesday": "Selasa",
+        "Wednesday": "Rabu",
+        "Thursday": "Kamis",
+        "Friday": "Jumat",
+        "Saturday": "Sabtu",
+        "Sunday": "Minggu"
+    }
+
+    hari_ini = hari_dict[now.strftime("%A")]
+    tanggal_ini = now.strftime("%d %B %Y")
+
+    if request.method == 'POST':
+        question = request.POST.get('question')
+        if question:
+            try:
+                # Inisialisasi client Groq
+                client = Groq(
+                    api_key=settings.GROQ_API_KEY
+                )
+                # Kirim permintaan ke Groq
+                chat_completion = client.chat.completions.create(
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": question,
+                        }
+                    ],
+                    model="llama-3.3-70b-versatile",
+                )
+                # Ambil jawaban dari API
+                answer = chat_completion.choices[0].message.content
+
+                if answer:
+                    return render(request, "tasks/result.html", {'answer': answer, 'tasks': tasks})
+                else:
+                    return render(request, "tasks/result.html", {'answer': "Terjadi kesalahan!", 'tasks': tasks})
+            
+            except Exception as e:
+                # Tampilkan error jika terjadi masalah
+                return HttpResponse(f"Terjadi kesalahan: {e}")
+
+    # Jika bukan POST atau tidak ada pertanyaan, tampilkan form
+    return render(request, "tasks/ask.html", {"tasks": tasks, 'hari': hari_ini, 'tanggal': tanggal_ini})
+
+
+@login_required(login_url='login')
 def delete_task(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     if request.method == 'POST':

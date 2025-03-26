@@ -39,24 +39,53 @@ $(document).ready(function () {
   $("#dropdownMenu").on("click", function (event) {
     event.stopPropagation();
   });
-  
+
   $("#appsBtn").on("click", function (event) {
     event.stopPropagation();
     $("#appDropdown").toggleClass("hidden");
   });
-  
+
   $(document).on("click", function () {
     $("#appDropdown").addClass("hidden");
   });
-  
+
   $("#addTaskBtn").on("click", function (event) {
     event.stopPropagation();
     $("#addTaskForms").toggleClass("hidden");
   });
-  
+
   $("#closeForms").on("click", function (event) {
     event.stopPropagation();
     $("#addTaskForms").toggleClass("hidden");
+  });
+
+  $("#futureListsBtn").on("click", function () {
+    if ($("#futureDropdown").hasClass("hidden")) {
+      $("#futureDropdown").removeClass("hidden");
+    } else {
+      $("#futureDropdown").addClass("hidden");
+    }
+  });
+
+  $("#futureDropdown").on("click", function (event) {
+    event.stopPropagation();
+  });
+
+  $(document).on("click", function (event) {
+    const target = $(event.target);
+
+    if (!target.closest("#notifBtn, #notifDropdown").length) {
+      $("#notifDropdown").addClass("hidden");
+    }
+    if (!target.closest("#profileImage, #dropdownMenu").length) {
+      $("#dropdownMenu").addClass("hidden");
+    }
+    if (!target.closest("#appsBtn, #appDropdown").length) {
+      $("#appDropdown").addClass("hidden");
+    }
+    if (!target.closest("#editFormBtn, #edit_form").length) {
+      $("#edit_form").addClass("hidden");
+    }
   });
 
   // Edit Form Toggle
