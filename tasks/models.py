@@ -10,6 +10,17 @@ class Task(models.Model):
     deadline = models.DateTimeField(blank=True, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=True)
     started = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+    def delete(self, *args, **kwargs):
+        """Soft delete: Menandai tugas sebagai dihapus tanpa benar-benar menghapusnya"""
+        self.deleted_at = timezone.now()
+        self.save()
+
+    def restore(self):
+        """Memulihkan tugas yang telah dihapus"""
+        self.deleted_at = None
+        self.save()
 
     # Metode untuk memberikan pesan warning
     def is_deadline_approaching(self):

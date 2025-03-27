@@ -10,6 +10,7 @@ from .models import Task
 from .models import UserProfile
 from .forms import UserProfileForm, TodoForm
 from firebase_config import db
+from datetime import timedelta
 import datetime
 import json
 import requests
@@ -30,9 +31,73 @@ def edit_profile(request):
     
     return render(request, 'tasks/edit_profile.html', {'form': form, 'tasks': tasks})
 
+
+    tasks = Task.objects.filter(owner=request.user,
+    completed=False)
+    now = datetime.datetime.now()
+
+    hari_dict = {
+        "Monday": "Senin",
+        "Tuesday": "Selasa",
+        "Wednesday": "Rabu",
+        "Thursday": "Kamis",
+        "Friday": "Jumat",
+        "Saturday": "Sabtu",
+        "Sunday": "Minggu"
+    }
+
+    hari_ini = hari_dict[now.strftime("%A")]
+    tanggal_ini = now.strftime("%d %B %Y")
+    
+
+    query = request.GET.get('search')
+    if query:
+        tasks = Task.objects.filter(title__icontains=query, owner=request.user)
+
+    for task in tasks:            
+        if task.is_deadline_approaching():
+            messages.warning(request, f"Tugas '{task.title}' hampir mencapai deadline!")
+
+        elif task.is_overdue():
+            messages.error(request, f"Tugas '{task.title}' sudah melewati deadline!")
+
+    if filter_status == "completed":
+        tasks = tasks.filter(completed=True)
+    elif filter_status == "started":
+        tasks = tasks.filter(started=True)
+    elif filter_status == "overdue":
+        tasks = tasks.filter(deadline__lt=now, completed=False)
+
+    if request.method == "POST":
+        title = request.POST.get('task-title')
+        description = request.POST.get('task-desc')
+        deadline = request.POST.get('task-deadline')
+        new_task = Task(
+            title=title, 
+            description=description, 
+            deadline=deadline,
+            owner=request.user
+        )
+        new_task.save()
+        return redirect('index')
+    
+    context = {
+        'tasks': tasks,
+        'search_query': query,
+        'hari': hari_ini,
+        'tanggal': tanggal_ini,
+        'filter_status': filter_status
+    }
+
+    return render(request, 'tasks/index.html', context)
+
 @login_required(login_url='login')
-def index(request):
-    tasks = Task.objects.filter(owner=request.user)
+def short_task(request):
+    tasks = Task.objects.filter(
+        owner=request.user,
+        completed=False,
+        deadline__gte=timezone.now()
+    ).order_by('deadline')
     now = datetime.datetime.now()
 
     hari_dict = {
@@ -78,6 +143,87 @@ def index(request):
         return redirect('index')
 
     return render(request, 'tasks/index.html', {'tasks': tasks, 'search_query': query, 'hari': hari_ini, 'tanggal': tanggal_ini})
+
+
+@login_required(login_url='login')
+def index(request):
+    tasks = Task.objects.filter(owner=request.user, deleted_at__isnull=True)
+    now = timezone.now()
+
+    # Dictionary untuk konversi nama hari ke bahasa Indonesia
+    hari_dict = {
+        "Monday": "Senin",
+        "Tuesday": "Selasa",
+        "Wednesday": "Rabu",
+        "Thursday": "Kamis",
+        "Friday": "Jumat",
+        "Saturday": "Sabtu",
+        "Sunday": "Minggu"
+    }
+
+    hari_ini = hari_dict[now.strftime("%A")]
+    tanggal_ini = now.strftime("%d %B %Y")
+
+    # Ambil parameter dari URL untuk filtering
+    query = request.GET.get('search', '')  # Untuk pencarian tugas
+    filter_status = request.GET.get('filter', '')  # Untuk filter status
+
+    # Filter berdasarkan pencarian
+    if query:
+        tasks = tasks.filter(title__icontains=query)
+
+    # Filter berdasarkan status tugas
+    if filter_status == "completed":
+        tasks = tasks.filter(completed=True)
+    elif filter_status == "started":
+        tasks = tasks.filter(started=True)
+    elif filter_status == "overdue":
+        tasks = tasks.filter(deadline__lt=now, completed=False)  # Tugas yang melewati deadline dan belum selesai
+
+    # Tambahkan pesan peringatan untuk tugas yang mendekati deadline atau sudah lewat
+    for task in tasks:
+        if task.is_deadline_approaching():
+            messages.warning(request, f"Tugas '{task.title}' hampir mencapai deadline!")
+
+        elif task.is_overdue():
+            messages.error(request, f"Tugas '{task.title}' sudah melewati deadline!")
+
+    # Proses form untuk menambahkan tugas baru
+    if request.method == "POST":
+        title = request.POST.get('task-title')
+        description = request.POST.get('task-desc')
+        deadline = request.POST.get('task-deadline')
+
+        if title and deadline:
+            new_task = Task(
+                title=title,
+                description=description,
+                deadline=deadline,
+                owner=request.user
+            )
+            new_task.save()
+            return redirect('index')
+
+    context = {
+        'tasks': tasks,
+        'search_query': query,
+        'hari': hari_ini,
+        'tanggal': tanggal_ini,
+        'filter_status': filter_status
+    }
+
+    return render(request, 'tasks/index.html', context)
+
+def history_tasks(request):
+    one_month_ago = timezone.now() - timedelta(days=30)
+    tasks = Task.objects.filter(owner=request.user, deleted_at__gte=one_month_ago)
+
+    return render(request, 'tasks/history.html', {'tasks': tasks})
+
+def restore_task(request, task_id):
+    task = Task.objects.get(id=task_id, owner=request.user, deleted_at__isnull=False)
+    task.restore()
+    return redirect('history_task')
 
 @login_required(login_url='login')
 def ask_ai(request):
@@ -188,64 +334,19 @@ def edit_task(request, task_id):
         return redirect('index')
 
 @login_required(login_url='login')
+def history_task(request):
+    one_month_ago = timezone.now() - timedelta(days=30)
+    tasks = Task.objects.filter(owner=request.user, deleted_at__gte=one_month_ago)
+
+    return render(request, 'tasks/history.html', {'tasks': tasks})
+
+@login_required(login_url='login')
 def started_task(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     if request.method == 'POST':
         task.started = not task.started
         task.save()
         return redirect('index')
-        
-@login_required(login_url='login')
-def started_task_filters(request):
-    tasks = Task.objects.filter(owner=request.user, started=True)
-    now = datetime.datetime.now()
-
-    hari_dict = {
-        "Monday": "Senin",
-        "Tuesday": "Selasa",
-        "Wednesday": "Rabu",
-        "Thursday": "Kamis",
-        "Friday": "Jumat",
-        "Saturday": "Sabtu",
-        "Sunday": "Minggu"
-    }
-
-    hari_ini = hari_dict[now.strftime("%A")]
-    tanggal_ini = now.strftime("%d %B %Y")
-
-    if request.method == 'POST':
-        question = request.POST.get('question')
-        if question:
-            try:
-                # Inisialisasi client Groq
-                client = Groq(
-                    api_key=settings.GROQ_API_KEY
-                )
-                # Kirim permintaan ke Groq
-                chat_completion = client.chat.completions.create(
-                    messages=[
-                        {
-                            "role": "user",
-                            "content": question,
-                        }
-                    ],
-                    model="llama-3.3-70b-versatile",
-                )
-                # Ambil jawaban dari API
-                answer = chat_completion.choices[0].message.content
-
-                if answer:
-                    return render(request, "tasks/result.html", {'answer': answer, 'tasks': tasks})
-                else:
-                    return render(request, "tasks/result.html", {'answer': "Terjadi kesalahan!", 'tasks': tasks})
-            
-            except Exception as e:
-                # Tampilkan error jika terjadi masalah
-                return HttpResponse(f"Terjadi kesalahan: {e}")
-
-    # Jika bukan POST atau tidak ada pertanyaan, tampilkan form
-    return render(request, "tasks/ask.html", {"tasks": tasks, 'hari': hari_ini, 'tanggal': tanggal_ini})
-
 
 @login_required(login_url='login')
 def delete_task(request, task_id):

@@ -1,0 +1,24 @@
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<h2 class="text-xl font-bold mb-4">📜 History Tugas (1 Bulan Terakhir)</h2>
+
+{% if tasks %}
+    <ul class="bg-white shadow-md rounded-lg p-4">
+        {% for task in tasks %}
+        <li class="p-2 border-b last:border-none">
+            <div class="flex justify-between">
+                <span class="text-gray-700">{{ task.title }}</span>
+                <span class="text-sm text-gray-500">Dihapus pada: {{ task.deleted_at|date:"d M Y H:i" }}</span>
+            </div>
+            <form method="post" action="{% url 'restore_task' task.id %}">
+                {% csrf_token %}
+                <button class="text-blue-500 hover:underline mt-1">Pulihkan</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p class="text-gray-500">Tidak ada tugas yang dihapus dalam 1 bulan terakhir.</p>
+{% endif %}
+{% endblock %}
