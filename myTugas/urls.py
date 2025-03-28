@@ -23,21 +23,30 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
+    # Authentication
     path('', views.user_login, name='login'),
-    path("admin/", admin.site.urls),
-    path('logout/', views.user_logout, name='logout'),
-    path('register/', views.register, name='register'),
-    path('home/', views.index, name='index'),
-    path('history/', login_required(views.history_task), name='history_task'),
-    path('restore/<int:task_id>/', login_required(views.restore_task), name='restore_task'),
-    path('edit/<int:task_id>/', login_required(views.edit_task), name='edit_task'),
-    path('started/<int:task_id>/', login_required(views.started_task), name='started_task'),
-    path('short_tasks/', login_required(views.short_task), name='short_task'),
-    path('delete/<int:task_id>/', login_required(views.delete_task), name='delete_task'),
-    path('ask/', views.ask_ai, name='ask_ai'),
-    path('profile/edit/', edit_profile, name='edit_profile'),
-    path("add/", views.add_todo, name="add_todo"),
+    path("logout/", views.user_logout, name='logout'),
+    path("register/", views.register, name='register'),
+
+    # Dashboard & Task Management
+    path("home/", views.index, name='index'),
+    path("add_task/", views.add_todo, name="add_task"),
     path("tugas/", views.tugas_list, name="tugas_list"),
+    path("ask/", views.ask_ai, name="ask_ai"),
+
+    # Task Actions
+    path("restore/<int:task_id>/", views.restore_task, name="restore_task"),
+    path("edit/<int:task_id>/", views.edit_task, name="edit_task"),
+    path("delete/<int:task_id>/", views.delete_task, name="delete_task"),
+    path("started/<int:task_id>/", views.started_task, name="started_task"),
+    path("short_tasks/", views.short_task, name="short_task"),
+
+    # Profile
+    path("profile/edit/", views.edit_profile, name="edit_profile"),
+
+    # Admin
+    path("admin/", admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 
 

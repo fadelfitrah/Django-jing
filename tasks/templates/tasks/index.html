@@ -106,7 +106,7 @@
             <select name="filter" id="filter" class="w-full px-4 py-2 text-gray-700 bg-white border-none focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-r-lg" onchange="this.form.submit()">
                 <option value="">Semua Tugas</option>
                 <option value="completed" {% if filter_status == "completed" %}selected{% endif %}>✅ Selesai</option>
-                <option value="started" {% if filter_status == "started" %}selected{% endif %}>🚀 Sedang Dikerjakan</option>
+                <option value="started" {% if filter_status == "started" %}selected{% endif %}>⭐ Tugas Berbintang</option>
                 <option value="overdue" {% if filter_status == "overdue" %}selected{% endif %}>⚠️ Sudah Melewati Deadline</option>
             </select>
         </div>
@@ -138,7 +138,7 @@
 
     <div class="flex flex-col ease-in-out w-[15rem] pl-4 mr-10 gap-5 mt-3" id="futureDropdown">
       <a href="{% url 'index' %}" class="flex gap-6 hover:text-blue-500"><i class="bi bi-list-task"></i> Tugas Saya</a>
-      <a href="{% url 'history_task' %}" class="flex w-full gap-6 hover:text-blue-500"><i class="bi bi-calendar-week"></i>  History Tugas</a>
+      <a href="{% url 'index' %}?filter=history" class="flex w-full gap-6 hover:text-blue-500"><i class="bi bi-calendar-week"></i> History Tugas</a>
     </div>
   </div>
 
@@ -185,6 +185,9 @@
         <th class="py-3 px-4">Judul Tugas</th>
         <th class="py-3 px-4">Status</th>
         <th class="py-3 px-4">Deadline</th>
+        {% if filter_status == "history" %}
+          <th class="py-3 px-4">Tanggal Dihapus</th>
+        {% endif %}
         <th class="py-3 px-4">Aksi</th>
       </tr>
     </thead>
@@ -223,25 +226,42 @@
         <td class="py-3 px-4 text-center">
           {{ task.deadline|date:"d M Y H:i" }}
         </td>
+        {% if filter_status == "history" %}
+          <td class="py-3 px-4 text-center">
+            {{ task.deleted_at|date:"d M Y H:i" }}
+          </td>
+        {% endif %}
+
         <td class="py-3 px-4 flex justify-center gap-2">
-          {% if not task.completed %}
-          <form method="POST" action="{% url 'edit_task' task.id %}">
-            {% csrf_token %}
-            <button
-              type="submit"
-              class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded">
-              <i class="bi bi-check-square-fill"></i>
-            </button>
-          </form>
+          {% if filter_status == "history" %}
+            <form method="POST" action="{% url 'restore_task' task.id %}">
+              {% csrf_token %}
+              <button
+                type="submit"
+                class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded">
+                <i class="bi bi-arrow-counterclockwise"></i> Restore
+              </button>
+            </form>
+          {% else %}
+            {% if not task.completed %}
+            <form method="POST" action="{% url 'edit_task' task.id %}">
+              {% csrf_token %}
+              <button
+                type="submit"
+                class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded">
+                <i class="bi bi-check-square-fill"></i>
+              </button>
+            </form>
+            {% endif %}
+            <form method="POST" action="{% url 'delete_task' task.id %}">
+              {% csrf_token %}
+              <button
+                type="submit"
+                class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded">
+                <i class="bi bi-trash-fill"></i>
+              </button>
+            </form>
           {% endif %}
-          <form method="POST" action="{% url 'delete_task' task.id %}">
-            {% csrf_token %}
-            <button
-              type="submit"
-              class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded">
-              <i class="bi bi-trash-fill"></i>
-            </button>
-          </form>
         </td>
       </tr>
       {% empty %}

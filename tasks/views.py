@@ -178,7 +178,10 @@ def index(request):
     elif filter_status == "started":
         tasks = tasks.filter(started=True)
     elif filter_status == "overdue":
-        tasks = tasks.filter(deadline__lt=now, completed=False)  # Tugas yang melewati deadline dan belum selesai
+        tasks = tasks.filter(deadline__lt=now, completed=False)
+    elif filter_status == "history":
+        one_month_ago = timezone.now() - timedelta(days=30)
+        tasks = Task.objects.filter(owner=request.user, deleted_at__gte=one_month_ago)
 
     # Tambahkan pesan peringatan untuk tugas yang mendekati deadline atau sudah lewat
     for task in tasks:
@@ -214,16 +217,10 @@ def index(request):
 
     return render(request, 'tasks/index.html', context)
 
-def history_tasks(request):
-    one_month_ago = timezone.now() - timedelta(days=30)
-    tasks = Task.objects.filter(owner=request.user, deleted_at__gte=one_month_ago)
-
-    return render(request, 'tasks/history.html', {'tasks': tasks})
-
 def restore_task(request, task_id):
     task = Task.objects.get(id=task_id, owner=request.user, deleted_at__isnull=False)
     task.restore()
-    return redirect('history_task')
+    return redirect('index')
 
 @login_required(login_url='login')
 def ask_ai(request):
@@ -332,13 +329,6 @@ def edit_task(request, task_id):
         task.completed = not task.completed
         task.save()
         return redirect('index')
-
-@login_required(login_url='login')
-def history_task(request):
-    one_month_ago = timezone.now() - timedelta(days=30)
-    tasks = Task.objects.filter(owner=request.user, deleted_at__gte=one_month_ago)
-
-    return render(request, 'tasks/history.html', {'tasks': tasks})
 
 @login_required(login_url='login')
 def started_task(request, task_id):
